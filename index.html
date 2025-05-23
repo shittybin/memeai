@@ -208,7 +208,8 @@
                 .join('');
         }
 
-        async function generateMemeCaption(topic) {
+async function generateMemeCaption(topic) {
+
     try {
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
@@ -234,6 +235,7 @@
         return { topText: 'API error', bottomText: 'Try again later' };
     }
 }
+
 
 
 
