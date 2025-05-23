@@ -223,23 +223,17 @@
                     messages: [
                         {
                             role: 'user',
-                            content: [
-                                {
-                                    type: 'text',
-                                    text: `You are a meme expert. Generate a funny meme caption about ${topic}. Format as: Top text / Bottom text`,
-                                },
-                            ],
+                            content: topic,
                         },
                     ],
                 }),
             }
         );
+
         const data = await response.json();
-        const [topText, bottomText] = data.message.split('/').map((text) => text.trim());
-        return { topText, bottomText };
+        return data;
     } catch (error) {
-        console.error('Error generating caption:', error);
-        return { topText: 'Error generating', bottomText: 'Please try again' };
+        console.error('Error generating meme caption:', error);
     }
 }
 
