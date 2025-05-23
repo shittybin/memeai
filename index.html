@@ -74,6 +74,11 @@
     display: block;
     max-height: 80vh; /* optional: limit max height to viewport */
 }
+#memeCanvas {
+  width: 100%;    /* scales canvas width to container width */
+  height: auto;   /* scales height preserving aspect ratio */
+  display: block;
+}
 
     </style>
 </head>
@@ -119,13 +124,20 @@
             </div>
 
             <div class="neubrutalist-box bg-white p-6">
-                <h2 class="font-fredoka text-2xl mb-4">Your Meme</h2>
+                <h2 class="font-fredoka text-2xl mb-0 leading-tight">Your Meme</h2>
+<small class="mt-0 leading-none">Your Meme will appear here!</small>
+
                 <div
                     id="memePreview"
                     class="relative w-full bg-gray-100 flex items-center justify-center"
                 >
-                    <p class="text-gray-500">Your meme will appear here</p>
+                    <div id="memePreviewContainer" style="width: 600px; border: 1px solid #ccc; overflow: auto;">
+  <canvas id="memeCanvas"></canvas>
+</div>
+
                 </div>
+                
+
                 <div class="flex gap-4 mt-6">
                     <button
                         id="downloadMeme"
@@ -141,7 +153,6 @@
                     </button>
                 </div>
             </div>
-                 
         </div>
            
     </div>
@@ -149,9 +160,10 @@
 <footer class=" text-center  bg-off-white  text-gray-700 font-semibold">
   <p>
     Created by <a href="https://github.com/jsdingra11" target="_blank" rel="noopener noreferrer" class="text-hot-pink hover:underline">Jashanpreet Singh Dingra</a> &mdash; Powered by ☕️
-  </p>
+<br>
+Open Source @ <a href="https://github.com/shittybin/memeai" style="color: rgb(215, 89, 184);">shittybin</a>
+</p>
 </footer>
-
     <script>
         const memeTemplates = [];
         let currentMeme = null;
@@ -209,71 +221,74 @@
                 return { topText: 'Error generating', bottomText: 'Please try again' };
             }
         }
+function renderMeme(template, topText, bottomText) {
+    const canvas = document.getElementById('memeCanvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
 
-        function renderMeme(template, topText, bottomText) {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+        // Set canvas to image size (no CSS scaling)
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
 
-            img.onload = () => {
-                canvas.width = img.width;
-                canvas.height = img.height;
+        // Draw the image fully
+        ctx.drawImage(img, 0, 0);
 
-                // Draw image
-                ctx.drawImage(img, 0, 0);
+        // Text style
+        ctx.fillStyle = 'white';
+        ctx.strokeStyle = 'black';
+        ctx.lineWidth = 4;
+        ctx.textAlign = 'center';
 
-                // Configure text style
-                ctx.fillStyle = 'white';
-                ctx.strokeStyle = 'black';
-                ctx.lineWidth = 3;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'top';
+        // Text font size relative to image width
+        const fontSize = canvas.width * 0.08;
+        ctx.font = `bold ${fontSize}px Impact`;
 
-                // Calculate font size based on canvas width
-                const fontSize = canvas.width * 0.1;
-                ctx.font = `bold ${fontSize}px Impact`;
+        // Draw top text (top padding 10px)
+        ctx.textBaseline = 'top';
+        drawText(ctx, topText.toUpperCase(), canvas.width / 2, 10, canvas.width - 20);
 
-                // Draw top text
-                drawText(ctx, topText, canvas.width / 2, 10, canvas.width);
+        // Draw bottom text (bottom padding 10px)
+        ctx.textBaseline = 'bottom';
+        drawText(ctx, bottomText.toUpperCase(), canvas.width / 2, canvas.height - 10, canvas.width - 20);
+    };
 
-                // Draw bottom text
-                ctx.textBaseline = 'bottom';
-                drawText(ctx, bottomText, canvas.width / 2, canvas.height - 10, canvas.width);
+    img.src = template.url;
+}
 
-                // Update preview
-                const preview = document.getElementById('memePreview');
-                preview.innerHTML = '';
-                preview.appendChild(canvas);
-                currentMeme = canvas;
-            };
-
-            img.crossOrigin = 'anonymous'; // Enable cross-origin for canvas use
-            img.src = template.url;
-        }
-
-        function drawText(ctx, text, x, y, maxWidth) {
-            const words = text.split(' ');
-            let line = '';
-            const lines = [];
-            const lineHeight = ctx.measureText('M').width * 1.5;
-
-            words.forEach((word) => {
-                const testLine = line + word + ' ';
-                const metrics = ctx.measureText(testLine);
-                if (metrics.width > maxWidth * 0.9) {
-                    lines.push(line);
-                    line = word + ' ';
-                } else {
-                    line = testLine;
-                }
-            });
+// Helper: Wrap text and draw it with stroke for meme style
+function drawText(ctx, text, x, y, maxWidth) {
+    const words = text.split(' ');
+    let line = '';
+    const lines = [];
+    for (let n = 0; n < words.length; n++) {
+        const testLine = line + words[n] + ' ';
+        const metrics = ctx.measureText(testLine);
+        if (metrics.width > maxWidth && n > 0) {
             lines.push(line);
-
-            lines.forEach((line, i) => {
-                ctx.strokeText(line, x, y + i * lineHeight);
-                ctx.fillText(line, x, y + i * lineHeight);
-            });
+            line = words[n] + ' ';
+        } else {
+            line = testLine;
         }
+    }
+    lines.push(line);
+
+    const lineHeight = ctx.measureText('M').width * 1.2;
+    if (ctx.textBaseline === 'top') {
+        for (let i = 0; i < lines.length; i++) {
+            ctx.strokeText(lines[i], x, y + i * lineHeight);
+            ctx.fillText(lines[i], x, y + i * lineHeight);
+        }
+    } else if (ctx.textBaseline === 'bottom') {
+        // Draw from bottom upwards
+        for (let i = 0; i < lines.length; i++) {
+            ctx.strokeText(lines[lines.length - 1 - i], x, y - i * lineHeight);
+            ctx.fillText(lines[lines.length - 1 - i], x, y - i * lineHeight);
+        }
+    }
+}
+
 
         document.getElementById('generateMeme').addEventListener('click', async () => {
             const templateId = document.getElementById('memeTemplate').value;
