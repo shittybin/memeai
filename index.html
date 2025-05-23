@@ -208,35 +208,39 @@
                 .join('');
         }
 
-async function generateMemeCaption(topic) {
-
-    try {
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer YOUR_OPENAI_API_KEY',
-            },
-            body: JSON.stringify({
-                model: 'gpt-3.5-turbo',
-                messages: [{
-                    role: 'user',
-                    content: `Generate a funny meme caption about ${topic}. Format as: Top text / Bottom text`,
-                }],
-            }),
-        });
-
-        const data = await response.json();
-        const result = data.choices[0].message.content;
-        const [topText, bottomText] = result.split('/').map(t => t.trim());
-        return { topText, bottomText };
-    } catch (err) {
-        console.error('OpenAI error:', err);
-        return { topText: 'API error', bottomText: 'Try again later' };
-    }
-}
-
-
+        async function generateMemeCaption(topic) {
+            try {
+                const response = await fetch(
+                    'https://r0c8kgwocscg8gsokogwwsw4.zetaverse.one/ai',
+                    {
+                        method: 'POST',
+                        headers: {
+                            Authorization: 'Bearer sk-ccba0a1666b34a80841c71ea04b2c67e',
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            messages: [
+                                {
+                                    role: 'user',
+                                    content: [
+                                        {
+                                            type: 'text',
+                                            text: `You are a meme expert. Generate a funny meme caption about ${topic}. Format as: Top text / Bottom text`,
+                                        },
+                                    ],
+                                },
+                            ],
+                        }),
+                    }
+                );
+                const data = await response.json();
+                const [topText, bottomText] = data.message.split('/').map((text) => text.trim());
+                return { topText, bottomText };
+            } catch (error) {
+                console.error('Error generating caption:', error);
+                return { topText: 'Error generating', bottomText: 'Please try again' };
+            }
+        }
 
 
             function renderMeme(template, topText, bottomText) {
