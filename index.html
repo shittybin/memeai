@@ -110,8 +110,6 @@
                 Meme<span class="text-hot-pink">AI</span>
             </h1>
             <p class="text-lg text-gray-700">Create viral memes with AI-powered captions!</p>
-            <p>Star the Repository @ <a href="https://github.com/shittybin/memeai" style="color: rgb(176, 68, 196);">shittybin/memeai</a></p>
-       
         </header>
 
         <div class="grid md:grid-cols-2 gap-8">
@@ -217,7 +215,7 @@
                     {
                         method: 'POST',
                         headers: {
-                            Authorization: 'Bearer 2srYX9suUcZ1zYuAzfE1grPHjZi2',
+                            Authorization: 'Bearer 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',
                             'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({
@@ -251,46 +249,34 @@
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = () => {
+        // Set canvas to image size (no CSS scaling)
         canvas.width = img.naturalWidth;
         canvas.height = img.naturalHeight;
 
-        // Draw the meme image
+        // Draw the image fully
         ctx.drawImage(img, 0, 0);
 
-        // Setup text style for main captions
+        // Text style
         ctx.fillStyle = 'white';
         ctx.strokeStyle = 'black';
         ctx.lineWidth = 4;
         ctx.textAlign = 'center';
 
-        const fontSize = Math.max(canvas.width * 0.06, 40);
-        ctx.font = `bold ${fontSize}px Impact`;
+        // Set a larger font size for meme-like appearance
+        const fontSize = Math.max(canvas.width * 0.06, 40); // Font size is 10% of canvas width or at least 40px
+        ctx.font = `bold ${fontSize}px Impact`; // Use Impact font
 
-        // Draw top text
+        // Draw top text (top padding 10px)
         ctx.textBaseline = 'top';
         drawText(ctx, topText.toUpperCase(), canvas.width / 2, 10, canvas.width - 20);
 
-        // Draw bottom text
+        // Draw bottom text (bottom padding 10px)
         ctx.textBaseline = 'bottom';
         drawText(ctx, bottomText.toUpperCase(), canvas.width / 2, canvas.height - 10, canvas.width - 20);
-
-        // === Add watermark text at the bottom ===
-        const watermarkText = "Code by jsdingra11 - github";
-        ctx.font = `bold ${Math.max(canvas.width * 0.01, 20)}px Arial`;
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'; // semi-transparent white
-        ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)'; // subtle black outline
-        ctx.lineWidth = 2;
-        ctx.textBaseline = 'bottom';
-        ctx.fillText(watermarkText, canvas.width / 2, canvas.height - 5);
-        ctx.strokeText(watermarkText, canvas.width / 2, canvas.height - 5);
-
-        // Update currentMeme so download/share work
-        currentMeme = canvas;
     };
 
     img.src = template.url;
 }
-
 
 
         // Helper: Wrap text and draw it with stroke for meme style
