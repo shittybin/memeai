@@ -331,12 +331,34 @@
         });
 
         document.getElementById('downloadMeme').addEventListener('click', () => {
-            if (currentMeme) {
-                currentMeme.toBlob((blob) => {
-                    saveAs(blob, 'meme.png');
-                });
-            }
-        });
+    const canvas = document.getElementById('memeCanvas');
+    if (!canvas) return;
+
+    // Create a temporary canvas to add watermark without altering original
+    const tempCanvas = document.createElement('canvas');
+    const ctx = tempCanvas.getContext('2d');
+
+    // Copy size and image from original canvas
+    tempCanvas.width = canvas.width;
+    tempCanvas.height = canvas.height;
+    ctx.drawImage(canvas, 0, 0);
+
+    // Watermark style
+    const watermarkText = 'code by jsdingra11 - github';
+    ctx.font = `${Math.floor(canvas.width * 0.03)}px Arial`;
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)'; // semi-transparent black
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'bottom';
+
+    // Position watermark at bottom-right with 10px margin
+    ctx.fillText(watermarkText, canvas.width - 10, canvas.height - 10);
+
+    // Save the watermarked image
+    tempCanvas.toBlob((blob) => {
+        saveAs(blob, 'meme.png');
+    });
+});
+
         document.getElementById('shareMeme').addEventListener('click', () => {
             if (currentMeme) {
                 currentMeme.toBlob(async (blob) => {
