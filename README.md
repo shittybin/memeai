@@ -16,3 +16,5 @@ MemeAI is your new BFF for creating viral memes without breaking a sweat. Just p
    ```bash
    git clone https://github.com/shittybin/memeai.git
    cd memeai
+
+Made with ☕️ by github.com/jsdingra11
