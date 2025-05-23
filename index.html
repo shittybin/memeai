@@ -207,8 +207,7 @@
                 .map((template) => `<option value="${template.id}">${template.name}</option>`)
                 .join('');
         }
-
-       async function generateMemeCaption(topic) {
+async function generateMemeCaption(topic) {
     try {
         const apiKey = process.env.API_KEY; // Access the secret from environment variables
         const response = await fetch(
@@ -236,6 +235,7 @@
         console.error('Error generating meme caption:', error);
     }
 }
+
 
 
 
